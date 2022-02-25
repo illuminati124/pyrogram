@@ -81,8 +81,12 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
         self.reply_markup = reply_markup
         self.input_message_content = input_message_content
 
-    async def write(self):
+    async def write(self, client: "pyrogram.Client"):
         document = utils.get_input_file_from_file_id(self.file_id, self.file_ref)
+        
+        message, entities = (await utils.parse_text_entities(
+            client, self.caption, self.parse_mode, self.caption_entities
+        )).values()
 
         return raw.types.InputBotInlineResultDocument(
             id=self.id,
@@ -91,11 +95,12 @@ class InlineQueryResultCachedDocument(InlineQueryResult):
             description=self.description,
             document=document,
             send_message=(
-                await self.input_message_content.write(self.reply_markup)
+                await self.input_message_content.write(client, self.reply_markup)
                 if self.input_message_content
                 else raw.types.InputBotInlineMessageMediaAuto(
-                    reply_markup=self.reply_markup.write() if self.reply_markup else None,
-                    **await(Parser(None)).parse(self.caption, self.parse_mode)
+                    reply_markup=self.reply_markup.write(client) if self.reply_markup else None,
+                    message=message,
+                    entities=entities
                 )
             )
         ) 
