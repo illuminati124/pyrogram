@@ -46,6 +46,9 @@ class InlineQueryResultAudio(InlineQueryResult):
             
         audio_duration (``int``, *optional*):
             Audio duration in seconds.
+        
+        thumb_url (``str``, *optional*):
+            URL of the thumbnail for the result.
 
         caption (``str``, *optional*):
             Caption of the audio to be sent, 0-1024 characters.
