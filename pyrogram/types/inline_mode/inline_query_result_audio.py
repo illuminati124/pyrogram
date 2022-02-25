@@ -76,6 +76,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         audio_duration: int = 0,
         caption: str = "",
         parse_mode: Union[str, None] = object,
+        thumb_url: str = None,
         caption_entities: List["types.MessageEntity"] = None,
         reply_markup: "types.InlineKeyboardMarkup" = None,
         input_message_content: "types.InputMessageContent" = None
@@ -89,6 +90,7 @@ class InlineQueryResultAudio(InlineQueryResult):
         self.caption = caption
         self.parse_mode = parse_mode
         self.caption_entities = caption_entities
+        self.thumb_url = thumb_url
 
     async def write(self, client: "pyrogram.Client"):
         audio = raw.types.InputWebDocument(
@@ -110,6 +112,13 @@ class InlineQueryResultAudio(InlineQueryResult):
             id=self.id,
             type=self.type,
             title=self.title,
+            description=self.performer,
+            thumb=raw.types.InputWebDocument(
+                url=self.thumb_url,
+                size=0,
+                mime_type="image/jpeg",
+                attributes=[]
+            ) if self.thumb_url else None,
             content=audio,
             send_message=(
                 await self.input_message_content.write(client, self.reply_markup)
